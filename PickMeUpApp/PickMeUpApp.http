@@ -1,0 +1,6 @@
+@PickMeUpApp_HostAddress = http://localhost:5178
+
+GET {{PickMeUpApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
