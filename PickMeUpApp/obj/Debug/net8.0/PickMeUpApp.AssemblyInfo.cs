@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PickMeUpApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+73e6e2b403f8fc1db2b608ba6118ccfd42e22e89")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f1a8fef64a9399352c3df0576f3f5fcbf6690c8")]
 [assembly: System.Reflection.AssemblyProductAttribute("PickMeUpApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PickMeUpApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -8,6 +8,10 @@ namespace PickMeUpApp.Models
         [Required]
         public int UserId { get; set; }
         [Required]
+        public User User { get; set; }
+        [Required]
         public int RouteId { get; set; }
+        [Required]
+        public TheRoute Route { get; set; }
     }
 }
