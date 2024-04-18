@@ -13,11 +13,11 @@ namespace PickMeUpApp.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
-
-        public UserController(IUserService _userService)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public UserController(IUserService _userService, IHttpContextAccessor _httpContextAccessor)
         {
             userService = _userService;
-
+            httpContextAccessor = _httpContextAccessor;
         }
 
         [HttpGet("GetUsers-ADMIN")]
@@ -50,7 +50,7 @@ namespace PickMeUpApp.Controllers
         [HttpPost("UserLogin")]
         public async Task<IActionResult> UserLogin(dtoUserLogin userDto)
         {
-            var (errorStatus, token) = await userService.UserLogin(userDto);
+            var (errorStatus, token) = await userService.UserLogin(userDto, httpContextAccessor.HttpContext);
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(token);

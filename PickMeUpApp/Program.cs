@@ -17,6 +17,7 @@ builder.Services.AddScoped<IUserService,UserService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UsersApiConnectionString")));
 
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -27,6 +28,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

@@ -1,3 +1,11 @@
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.csproj.AssemblyReference.cache
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.AssemblyInfoInputs.cache
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.AssemblyInfo.cs
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.csproj.CoreCompileInputs.cache
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.sourcelink.json
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\appsettings.json
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\PickMeUpApp.exe
@@ -7,6 +15,7 @@ C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Pick
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\PickMeUpApp.pdb
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\BCrypt.Net.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Humanizer.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.Internal.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
@@ -119,13 +128,6 @@ C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\runt
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.csproj.AssemblyReference.cache
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.AssemblyInfoInputs.cache
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.AssemblyInfo.cs
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.csproj.CoreCompileInputs.cache
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\staticwebassets\msbuild.PickMeUpApp.Microsoft.AspNetCore.StaticWebAssets.props
@@ -140,5 +142,3 @@ C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\refi
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.pdb
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\ref\PickMeUpApp.dll
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\BCrypt.Net.dll
-C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.sourcelink.json
