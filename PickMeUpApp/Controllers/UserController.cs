@@ -20,6 +20,24 @@ namespace PickMeUpApp.Controllers
 
         }
 
+        [HttpGet("GetUsers-ADMIN")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var (errorStatus, users) = await userService.GetUsers();
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(users);
+        }
+
+        [HttpPost("GetUserRoutes")]
+        public async Task<IActionResult> GetUserRoutes ([FromBody] string email)
+        {
+            var (errorStatus, routes) = await userService.GetUserRoutes(email);
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(routes);
+        }
+
         [HttpPost("UserRegistration")]
         public async Task<IActionResult> UserRegistration(dtoUserRegistration userDto)
         {
@@ -46,5 +64,25 @@ namespace PickMeUpApp.Controllers
                 return BadRequest(errorStatus.Name);
             return Ok(route);
         }
+
+        [HttpPost("SendRequest")]
+        public async Task<IActionResult> SendRequest(dtoRequest dtoRequest)
+        {
+            var (errorStatus, request) = await userService.SendRequest(dtoRequest);
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(request);
+        }
+
+        [HttpPost("GetSentRequests")]
+        public async Task<IActionResult> GetSentRequests([FromBody] string email)
+        {
+            var (errorStatus, sentRequests) = await userService.GetSentRequests(email);
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(sentRequests);
+        }
+
+
     }
 }

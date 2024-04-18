@@ -10,6 +10,7 @@ namespace PickMeUpApp.Context
         public DbSet<User> Users {  get; set; }
         public DbSet<TheRoute> Routes { get; set; }
         public DbSet<UserRoute> UserRoutes { get; set; }
+        public DbSet<Request> Requests { get; set; }
 
     }
 

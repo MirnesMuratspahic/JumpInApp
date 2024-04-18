@@ -141,3 +141,4 @@ C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\Pick
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\ref\PickMeUpApp.dll
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\BCrypt.Net.dll
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.sourcelink.json
