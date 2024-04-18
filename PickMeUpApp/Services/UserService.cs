@@ -1,19 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PickMeUpApp.Context;
 using PickMeUpApp.Models;
 using PickMeUpApp.Models.DTO;
 using PickMeUpApp.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Http;
 
 namespace PickMeUpApp.Services
+
 {
     public class UserService : IUserService
     {
@@ -116,7 +113,7 @@ namespace PickMeUpApp.Services
 
         }
 
-        public async Task<(ErrorProvider, string)> UserLogin(dtoUserLogin userDto)
+        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -143,7 +140,18 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
             var token = CreateToken(userFromDatabase);
-            return (error, token);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddDays(1),
+                Secure = true,
+                SameSite = SameSiteMode.Lax
+            };
+
+            httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
+
+            return (error, userFromDatabase);
 
         }
 
