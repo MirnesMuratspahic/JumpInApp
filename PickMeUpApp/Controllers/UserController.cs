@@ -29,6 +29,15 @@ namespace PickMeUpApp.Controllers
             return Ok(users);
         }
 
+        [HttpGet("GetRoutes")]
+        public async Task<IActionResult> GetRoutes()
+        {
+            var (errorStatus, routes) = await userService.GetRoutes();
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(routes);
+        }
+
         [HttpPost("GetUserRoutes")]
         public async Task<IActionResult> GetUserRoutes ([FromBody] string email)
         {
@@ -81,6 +90,24 @@ namespace PickMeUpApp.Controllers
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(sentRequests);
+        }
+
+        [HttpPost("AcceptRequest")]
+        public async Task<IActionResult> AcceptRequest(dtoRequest request)
+        {
+            var (errorStatus, acceptedRequests) = await userService.AcceptRequest(request);
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(acceptedRequests);
+        }
+
+        [HttpPost("GetRecivedRequests")]
+        public async Task<IActionResult> GetRecivedRequests([FromBody] string email)
+        {
+            var (errorStatus, recivedRequests) = await userService.GetRecivedRequests(email);
+            if (errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(recivedRequests);
         }
 
 
