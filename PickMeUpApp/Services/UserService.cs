@@ -303,10 +303,20 @@ namespace PickMeUpApp.Services
             return (error, dtoRequests);
         }
 
-        public async Task<(ErrorProvider, dtoRequest)> AcceptRequest(dtoRequest request)
+        public async Task<(ErrorProvider, dtoRequest)> AcceptorDeclineRequest(string choise, dtoRequest request)
         {
-            if(request == null) 
+            if(request == null || string.IsNullOrEmpty(choise)) 
                 return(defaultError, null);
+
+            if(choise != "0" || choise != "1")
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Polje choise nije validno!"
+                };
+                return (error, null);   
+            }    
 
             var requestFromDatabase = await DbContext.Requests.FirstOrDefaultAsync(x=>x.PassengerEmail == request.passengerEmail 
                                                                     && x.UserRoute.User.Email == request.dtoUserRoute.User.Email);
@@ -321,7 +331,11 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            requestFromDatabase.Status = "Accepted";
+            if (choise == "0")
+                requestFromDatabase.Status = "Declined";
+            else if (choise == "1") 
+                requestFromDatabase.Status = "Accepted";
+
             await DbContext.SaveChangesAsync();
             request.Status = "Accepted";
 
