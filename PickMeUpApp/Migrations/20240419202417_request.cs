@@ -5,7 +5,7 @@
 namespace PickMeUpApp.Migrations
 {
     /// <inheritdoc />
-    public partial class userrouteNew : Migration
+    public partial class request : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

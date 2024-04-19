@@ -11,8 +11,8 @@ using PickMeUpApp.Context;
 namespace PickMeUpApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240418174315_userrouteNew")]
-    partial class userrouteNew
+    [Migration("20240419202417_request")]
+    partial class request
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
