@@ -92,8 +92,8 @@ namespace PickMeUpApp.Controllers
             return Ok(sentRequests);
         }
 
-        [HttpPost("AcceptOrDeclineRequest")]
-        public async Task<IActionResult> AcceptOrDeclineRequest(string choise, dtoRequest request)
+        [HttpPost("AcceptOrDeclineRequest/{choise}")]
+        public async Task<IActionResult> AcceptOrDeclineRequest([FromRoute] int choise, dtoRequest request)
         {
             var (errorStatus, acceptedRequests) = await userService.AcceptOrDeclineRequest(choise, request);
             if (errorStatus.Status == true)

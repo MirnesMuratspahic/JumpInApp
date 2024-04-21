@@ -13,7 +13,7 @@ namespace PickMeUpApp.Services.Interfaces
         Task<(ErrorProvider, dtoTheRoute)> AddRoute(dtoUserRoute route);
         Task<(ErrorProvider, dtoRequest)> SendRequest(dtoRequest dtoRequest);
         Task<(ErrorProvider, List<dtoRequest>)> GetSentRequests(string passengerEmail);
-        Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(string choise, dtoRequest request);
+        Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(int choise, dtoRequest request);
         Task<(ErrorProvider, List<dtoRequest>)> GetRecivedRequests(string email);
     }
 }
