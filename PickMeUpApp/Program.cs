@@ -16,6 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserService,UserService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UsersApiConnectionString")));
+builder.Services.AddCors(options => options.AddPolicy("AllowAnyOrigin",
+        builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }));
 
 builder.Services.AddHttpContextAccessor();
 

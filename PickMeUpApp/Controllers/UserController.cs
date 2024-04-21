@@ -50,7 +50,7 @@ namespace PickMeUpApp.Controllers
         [HttpPost("UserRegistration")]
         public async Task<IActionResult> UserRegistration(dtoUserRegistration userDto)
         {
-            var (errorStatus, token) = await userService.UserRegistration(userDto);
+            var (errorStatus, token) = await userService.UserRegistration(userDto, httpContextAccessor.HttpContext);
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(token);
@@ -92,10 +92,10 @@ namespace PickMeUpApp.Controllers
             return Ok(sentRequests);
         }
 
-        [HttpPost("AcceptRequest")]
-        public async Task<IActionResult> AcceptorDeclineRequest(string choise, dtoRequest request)
+        [HttpPost("AcceptOrDeclineRequest")]
+        public async Task<IActionResult> AcceptOrDeclineRequest(string choise, dtoRequest request)
         {
-            var (errorStatus, acceptedRequests) = await userService.AcceptorDeclineRequest(choise, request);
+            var (errorStatus, acceptedRequests) = await userService.AcceptOrDeclineRequest(choise, request);
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(acceptedRequests);

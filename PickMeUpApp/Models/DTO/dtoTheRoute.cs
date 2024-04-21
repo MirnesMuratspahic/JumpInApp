@@ -7,6 +7,10 @@ namespace PickMeUpApp.Models.DTO
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
+        public int SeatsNumber { get; set; }
+        [Required]
+        public DateTime DateAndTime { get; set; }
+        [Required]
         public string Description { get; set; } = string.Empty;
 
         public dtoTheRoute() { }
@@ -14,6 +18,8 @@ namespace PickMeUpApp.Models.DTO
         {
             Name = route.Name;
             Description = route.Description;
+            SeatsNumber = route.SeatsNumber;
+            DateAndTime = route.DateAndTime;
         }
     }
 }

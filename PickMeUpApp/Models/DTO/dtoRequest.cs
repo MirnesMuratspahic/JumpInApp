@@ -11,7 +11,7 @@ namespace PickMeUpApp.Models.DTO
         [Required]
         public string Description { get; set; } = string.Empty;
         [Required]
-        public string Status { get; set; } = "Panding";
+        public string Status { get; set; }
 
         public dtoRequest() { }
 
@@ -28,7 +28,8 @@ namespace PickMeUpApp.Models.DTO
             this.dtoUserRoute = new dtoUserRoute(_dtoUserRoute.User, _dtoUserRoute.Route);
             this.passengerEmail = passengerEmail;
             Description = description;
-            Status = status;
+            if (status == "string")
+                Status = "Panding";
         }
     }
 }

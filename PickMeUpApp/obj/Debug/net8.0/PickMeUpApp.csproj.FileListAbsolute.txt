@@ -142,3 +142,4 @@ C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\refi
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.pdb
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\ref\PickMeUpApp.dll
+C:\Users\Korisnik\Desktop\PickMeUpApp\PickMeUp\PickMeUpApp\bin\Debug\net8.0\web.config
