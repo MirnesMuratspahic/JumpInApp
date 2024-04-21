@@ -96,7 +96,7 @@ namespace PickMeUpApp.Services
         }
 
 
-        public async Task<(ErrorProvider, string)> UserRegistration(dtoUserRegistration userDto)
+        public async Task<(ErrorProvider, dtoUser)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContextAccessor)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -124,19 +124,38 @@ namespace PickMeUpApp.Services
                 PhoneNumber = userDto.PhoneNumber
             };
 
+            var dtoUser = new dtoUser()
+            {
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Email = newUser.Email,
+                PhoneNumber = newUser.PhoneNumber
+            };
+
             await DbContext.Users.AddAsync(newUser);
             await DbContext.SaveChangesAsync();
             var token = CreateToken(newUser);
-            return (error, token);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddDays(1),
+                Secure = true,
+                SameSite = SameSiteMode.Lax
+            };
+
+            httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
+
+            return (error, dtoUser);
 
         }
 
-        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
+        public async Task<(ErrorProvider, dtoUser)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
         {
             if (userDto == null)
                 return (defaultError, null);
 
-            var userFromDatabase = DbContext.Users.FirstOrDefault(x => x.Email == userDto.Email);
+            var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == userDto.Email);
 
             if (userFromDatabase == null)
             {
@@ -169,7 +188,9 @@ namespace PickMeUpApp.Services
 
             httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
-            return (error, userFromDatabase);
+            var dtoUserFromDatabase = await DbContext.Users.Select(x => new dtoUser(x)).FirstOrDefaultAsync(x => x.Email == userDto.Email);
+
+            return (error, dtoUserFromDatabase);
 
         }
 
@@ -217,7 +238,10 @@ namespace PickMeUpApp.Services
             var newRoute = new TheRoute()
             {
                 Name = route.Route.Name,
-                Description = route.Route.Description
+                Description = route.Route.Description,
+                SeatsNumber = route.Route.SeatsNumber,
+                DateAndTime = route.Route.DateAndTime
+
             };
 
             await DbContext.Routes.AddAsync(newRoute);
@@ -240,10 +264,9 @@ namespace PickMeUpApp.Services
             if (dtoRequest == null)
                 return (defaultError, null);
 
-            var userId = await DbContext.Users.Where(x => x.Email == dtoRequest.dtoUserRoute.User.Email).Select(x => x.UserId).FirstOrDefaultAsync();
-            var routeId = await DbContext.Routes.Where(x => x.Name == dtoRequest.dtoUserRoute.Route.Name).Select(x => x.Id).FirstOrDefaultAsync();
+            var (userId, routeId) = await DoesExistRoute(dtoRequest);
 
-            var userRoute = await DbContext.UserRoutes.Include(x=>x.User).Include(x=>x.Route).FirstOrDefaultAsync(x => x.UserId == userId && x.RouteId == routeId);
+            var userRoute = await DbContext.UserRoutes.FirstOrDefaultAsync(x=> x.UserId == userId && x.RouteId == routeId);
 
             if (userRoute == null)
             {
@@ -267,6 +290,30 @@ namespace PickMeUpApp.Services
             await DbContext.SaveChangesAsync();
 
             return (error, dtoRequest); 
+        }
+
+        private async Task<(int,int)> DoesExistRoute (dtoRequest dtoRequest)
+        {
+            var userId = await DbContext.Users.Where(x => x.Email == dtoRequest.dtoUserRoute.User.Email).Select(x => x.UserId).FirstOrDefaultAsync();
+            var routeId = await DbContext.Routes.Where(x => x.Name == dtoRequest.dtoUserRoute.Route.Name &&
+                                                       x.SeatsNumber == dtoRequest.dtoUserRoute.Route.SeatsNumber &&
+                                                       x.DateAndTime == dtoRequest.dtoUserRoute.Route.DateAndTime &&
+                                                       x.Description == dtoRequest.dtoUserRoute.Route.Description).Select(x => x.Id).FirstOrDefaultAsync();
+            return (userId, routeId);
+        }
+
+        private async Task<Request> DoesExistRequest(dtoRequest dtoRequest)
+        {
+            var (userId, routeId) = await DoesExistRoute(dtoRequest);
+            var userRoute = await DbContext.UserRoutes.FirstOrDefaultAsync(x => x.UserId == userId && x.RouteId == routeId);
+
+            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute.UserId == userId &&
+                                                                          x.UserRoute.RouteId == routeId &&
+                                                                          x.PassengerEmail == dtoRequest.passengerEmail &&
+                                                                          x.Status == dtoRequest.Status).Include(x => x.UserRoute.User)
+                                                                          .Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
+
+            return requestfromDatabase;
         }
 
         public async Task<(ErrorProvider, List<dtoRequest>)> GetSentRequests(string passengerEmail)
@@ -303,25 +350,34 @@ namespace PickMeUpApp.Services
             return (error, dtoRequests);
         }
 
-        public async Task<(ErrorProvider, dtoRequest)> AcceptorDeclineRequest(string choise, dtoRequest request)
+        public async Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(string choise, dtoRequest request)
         {
-            if(request == null || string.IsNullOrEmpty(choise)) 
-                return(defaultError, null);
+            if (request == null || string.IsNullOrEmpty(choise))
+                return (defaultError, null);
 
-            if(choise != "0" || choise != "1")
+            if (choise != "0" && choise != "1")
             {
                 error = new ErrorProvider()
                 {
                     Status = true,
                     Name = "Polje choise nije validno!"
                 };
-                return (error, null);   
-            }    
+                return (error, null);
+            }
 
-            var requestFromDatabase = await DbContext.Requests.FirstOrDefaultAsync(x=>x.PassengerEmail == request.passengerEmail 
-                                                                    && x.UserRoute.User.Email == request.dtoUserRoute.User.Email);
+            if(request.dtoUserRoute.Route.SeatsNumber == 0)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Broj mjesta je popunjen!"
+                };
+                return(error, null);    
+            }
 
-            if(requestFromDatabase == null)
+            var requestFromDatabase = await DoesExistRequest(request);
+
+            if (requestFromDatabase == null)
             {
                 error = new ErrorProvider()
                 {
@@ -332,9 +388,14 @@ namespace PickMeUpApp.Services
             }
 
             if (choise == "0")
-                requestFromDatabase.Status = "Declined";
-            else if (choise == "1") 
+            {
+                requestFromDatabase.Status = "Declined"; 
+            }
+            else if (choise == "1")
+            {
                 requestFromDatabase.Status = "Accepted";
+                requestFromDatabase.UserRoute.Route.SeatsNumber -= 1;
+            }
 
             await DbContext.SaveChangesAsync();
             request.Status = "Accepted";
@@ -360,7 +421,7 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == email).Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route)
+            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == email && x.Status == "panding").Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route)
                 .Select(x => new dtoRequest(x)).ToListAsync();
 
             if (requests.Count == 0)
