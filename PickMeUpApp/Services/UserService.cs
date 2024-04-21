@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Headers;
 
 namespace PickMeUpApp.Services
 
@@ -188,7 +189,13 @@ namespace PickMeUpApp.Services
 
             httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
-            var dtoUserFromDatabase = await DbContext.Users.Select(x => new dtoUser(x)).FirstOrDefaultAsync(x => x.Email == userDto.Email);
+            var dtoUserFromDatabase = new dtoUser()
+            {
+                FirstName = userFromDatabase.FirstName,
+                LastName = userFromDatabase.LastName,
+                Email = userFromDatabase.Email,
+                PhoneNumber = userFromDatabase.PhoneNumber
+            };
 
             return (error, dtoUserFromDatabase);
 
@@ -265,7 +272,7 @@ namespace PickMeUpApp.Services
                 return (defaultError, null);
 
             var (userId, routeId) = await DoesExistRoute(dtoRequest);
-
+            var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == dtoRequest.passengerEmail);
             var userRoute = await DbContext.UserRoutes.FirstOrDefaultAsync(x=> x.UserId == userId && x.RouteId == routeId);
 
             if (userRoute == null)
@@ -276,6 +283,16 @@ namespace PickMeUpApp.Services
                     Name = "Ne postoji poslana ruta u bazi!"
                 };
                 return (error, null);
+            }
+
+            if(passenger == null)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Ne postoji user sa poslanom passenger adresom u bazi!"
+                };
+                return(error, null);
             }
             
             var request = new Request()
@@ -350,12 +367,12 @@ namespace PickMeUpApp.Services
             return (error, dtoRequests);
         }
 
-        public async Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(string choise, dtoRequest request)
+        public async Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(int choise, dtoRequest request)
         {
-            if (request == null || string.IsNullOrEmpty(choise))
+            if (request == null || choise == null)
                 return (defaultError, null);
 
-            if (choise != "0" && choise != "1")
+            if (choise != 0 && choise != 1)
             {
                 error = new ErrorProvider()
                 {
@@ -387,11 +404,11 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            if (choise == "0")
+            if (choise == 0)
             {
                 requestFromDatabase.Status = "Declined"; 
             }
-            else if (choise == "1")
+            else if (choise == 1)
             {
                 requestFromDatabase.Status = "Accepted";
                 requestFromDatabase.UserRoute.Route.SeatsNumber -= 1;
