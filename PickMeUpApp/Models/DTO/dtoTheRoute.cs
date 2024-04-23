@@ -11,6 +11,8 @@ namespace PickMeUpApp.Models.DTO
         [Required]
         public DateTime DateAndTime { get; set; }
         [Required]
+        public float Price { get; set; }
+        [Required]
         public string Description { get; set; } = string.Empty;
 
         public dtoTheRoute() { }
@@ -20,6 +22,7 @@ namespace PickMeUpApp.Models.DTO
             Description = route.Description;
             SeatsNumber = route.SeatsNumber;
             DateAndTime = route.DateAndTime;
+            Price = route.Price;
         }
     }
 }

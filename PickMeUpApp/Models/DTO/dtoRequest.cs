@@ -28,8 +28,7 @@ namespace PickMeUpApp.Models.DTO
             this.dtoUserRoute = new dtoUserRoute(_dtoUserRoute.User, _dtoUserRoute.Route);
             this.passengerEmail = passengerEmail;
             Description = description;
-            if (status == "string")
-                Status = "Panding";
+            this.Status = status;
         }
     }
 }

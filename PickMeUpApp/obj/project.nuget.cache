@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "z5HN7b7Y8WRRP3Vno/xqzecMEUmT1KpoGJoy6QtTIBv+MsU5IRUH5zuou9BQiTMYjJ1HimOzcuWAcyqe1CR7ww==",
+  "dgSpecHash": "6+7FoBV21kUpPFCGvG9w7+iJMB42KjiIPUfxXP2s3//LgBFi4Fc6l4/YzoIvaTy91cG01gY5IhE9H2rYm4nYpw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Korisnik\\Desktop\\PickMeUpApp\\PickMeUp\\PickMeUpApp\\PickMeUpApp.csproj",
+  "projectFilePath": "C:\\Users\\Korisnik\\Desktop\\JumpinApp\\PickMeUp\\PickMeUpApp\\PickMeUpApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Korisnik\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\Korisnik\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

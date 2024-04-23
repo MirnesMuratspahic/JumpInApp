@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace PickMeUpApp.Services
 
@@ -230,6 +231,16 @@ namespace PickMeUpApp.Services
             if (route == null)
                 return (defaultError, null);
 
+            if(route.Route.SeatsNumber == 0)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Broj slobodnih mjesta mora biti minimalno 1"
+                };
+                return (error, null);
+            }
+
             var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == route.User.Email);
 
             if(userFromDatabase == null)
@@ -247,8 +258,8 @@ namespace PickMeUpApp.Services
                 Name = route.Route.Name,
                 Description = route.Route.Description,
                 SeatsNumber = route.Route.SeatsNumber,
-                DateAndTime = route.Route.DateAndTime
-
+                DateAndTime = route.Route.DateAndTime,
+                Price = route.Route.Price
             };
 
             await DbContext.Routes.AddAsync(newRoute);
@@ -283,6 +294,15 @@ namespace PickMeUpApp.Services
                     Name = "Ne postoji poslana ruta u bazi!"
                 };
                 return (error, null);
+            }
+
+            if(userRoute.Route.SeatsNumber == 0)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Sva mjesta su popunjena!"
+                };
             }
 
             if(passenger == null)
@@ -380,16 +400,6 @@ namespace PickMeUpApp.Services
                     Name = "Polje choise nije validno!"
                 };
                 return (error, null);
-            }
-
-            if(request.dtoUserRoute.Route.SeatsNumber == 0)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Broj mjesta je popunjen!"
-                };
-                return(error, null);    
             }
 
             var requestFromDatabase = await DoesExistRequest(request);
