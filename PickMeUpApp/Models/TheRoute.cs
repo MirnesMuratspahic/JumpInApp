@@ -12,6 +12,8 @@ namespace PickMeUpApp.Models
         [Required]
         public DateTime DateAndTime { get; set; }
         [Required]
+        public float Price { get; set; }
+        [Required]
         public string Description { get; set; } = string.Empty;
     }
 }

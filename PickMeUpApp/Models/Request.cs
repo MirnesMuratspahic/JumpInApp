@@ -13,7 +13,7 @@ namespace PickMeUpApp.Models
         [Required] 
         public string Description { get; set; } = string.Empty;
         [Required]
-        public string Status { get; set; } = "Panding";
+        public string Status { get; set; } = string.Empty;
 
         
     }
