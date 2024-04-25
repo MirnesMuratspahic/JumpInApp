@@ -9,8 +9,9 @@ namespace PickMeUpApp.Models
         public string Name { get; set; } = string.Empty;
         [Required]
         public int SeatsNumber { get; set; }
+
         [Required]
-        public DateTime DateAndTime { get; set; }
+        public string DateAndTime { get; set; } 
         [Required]
         public float Price { get; set; }
         [Required]

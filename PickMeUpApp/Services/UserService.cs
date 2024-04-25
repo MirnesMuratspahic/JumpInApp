@@ -284,7 +284,7 @@ namespace PickMeUpApp.Services
 
             var (userId, routeId) = await DoesExistRoute(dtoRequest);
             var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == dtoRequest.passengerEmail);
-            var userRoute = await DbContext.UserRoutes.FirstOrDefaultAsync(x=> x.UserId == userId && x.RouteId == routeId);
+            var userRoute = await DbContext.UserRoutes.Include(x=>x.User).Include(x=>x.Route).FirstOrDefaultAsync(x=> x.UserId == userId && x.RouteId == routeId);
 
             if (userRoute == null)
             {
