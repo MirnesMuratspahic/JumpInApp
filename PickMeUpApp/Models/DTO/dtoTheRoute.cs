@@ -9,7 +9,7 @@ namespace PickMeUpApp.Models.DTO
         [Required]
         public int SeatsNumber { get; set; }
         [Required]
-        public DateTime DateAndTime { get; set; }
+        public string DateAndTime { get; set; }
         [Required]
         public float Price { get; set; }
         [Required]
