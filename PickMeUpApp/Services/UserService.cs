@@ -81,7 +81,7 @@ namespace PickMeUpApp.Services
 
             var routesIds = await DbContext.UserRoutes.Where(x => x.UserId == user.UserId).Select(x => x.RouteId).ToListAsync();
             var dtoRoutes = await DbContext.Routes.Where(x => routesIds.Contains(x.Id))
-                .Select(x => new dtoTheRoute() { Name = x.Name, Description = x.Description }).ToListAsync();
+                .Select(x => new dtoTheRoute() { Name = x.Name, Description = x.Description, DateAndTime = x.Description, SeatsNumber = x.SeatsNumber, Price = x.Price }).ToListAsync();
 
             if(dtoRoutes.Count == 0)
             {
@@ -268,7 +268,9 @@ namespace PickMeUpApp.Services
             var userRoute = new UserRoute()
             {
                 UserId = userFromDatabase.UserId,
-                RouteId = newRoute.Id
+                RouteId = newRoute.Id,
+                Route = newRoute,
+                User = userFromDatabase
             };
 
             await DbContext.UserRoutes.AddAsync(userRoute);
@@ -284,8 +286,17 @@ namespace PickMeUpApp.Services
 
             var (userId, routeId) = await DoesExistRoute(dtoRequest);
             var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == dtoRequest.passengerEmail);
-            var userRoute = await DbContext.UserRoutes.Include(x=>x.User).Include(x=>x.Route).FirstOrDefaultAsync(x=> x.UserId == userId && x.RouteId == routeId);
+            var userRoute = await DbContext.UserRoutes.Include(x => x.User).Include(x => x.Route).FirstOrDefaultAsync(x => x.UserId == userId && x.RouteId == routeId);
 
+            if(dtoRequest.dtoUserRoute.User.Email == dtoRequest.passengerEmail)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Ne mozete slati zahtjev za rutu koju ste vi kreirali!"
+                };
+                return (error, null);
+            }
             if (userRoute == null)
             {
                 error = new ErrorProvider()
@@ -448,7 +459,7 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == email && x.Status == "panding").Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route)
+            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == email && x.Status.ToLower() == "panding").Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route)
                 .Select(x => new dtoRequest(x)).ToListAsync();
 
             if (requests.Count == 0)
