@@ -11,7 +11,7 @@ using PickMeUpApp.Context;
 namespace PickMeUpApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240425191041_initial migration")]
+    [Migration("20240426164951_initial migration")]
     partial class initialmigration
     {
         /// <inheritdoc />
@@ -87,11 +87,11 @@ namespace PickMeUpApp.Migrations
 
             modelBuilder.Entity("PickMeUpApp.Models.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -113,7 +113,7 @@ namespace PickMeUpApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });

@@ -288,9 +288,9 @@ C:\Users\Korisnik\Desktop\JumpinApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\refint
 C:\Users\Korisnik\Desktop\JumpinApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.pdb
 C:\Users\Korisnik\Desktop\JumpinApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\JumpinApp\PickMeUp\PickMeUpApp\obj\Debug\net8.0\ref\PickMeUpApp.dll
+C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\web.config
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\appsettings.json
-C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\web.config
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\PickMeUpApp.exe
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\PickMeUpApp.deps.json
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\PickMeUpApp.runtimeconfig.json

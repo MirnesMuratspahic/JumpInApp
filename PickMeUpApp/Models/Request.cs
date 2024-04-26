@@ -1,11 +1,12 @@
 ﻿using PickMeUpApp.Models.DTO;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PickMeUpApp.Models
 {
     public class Request
     {
-        [Key] public int Id { get; set; }
+        [JsonIgnore] [Key] public int Id { get; set; }
         [Required] 
         public UserRoute UserRoute { get; set; }
         [Required]
