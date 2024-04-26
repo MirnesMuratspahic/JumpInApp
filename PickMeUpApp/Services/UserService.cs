@@ -18,21 +18,24 @@ namespace PickMeUpApp.Services
     public class UserService : IUserService
     {
         public ApplicationDbContext DbContext { get; set; }
+
         public IConfiguration configuration { get; set; }
+
         public ErrorProvider error = new ErrorProvider() { Status = false};
 
         public ErrorProvider defaultError = new ErrorProvider() { Status = true, Name = "Property koji ste poslali ne smije biti null!" };
-
+        public UserService() { }
         public UserService(ApplicationDbContext context, IConfiguration _configuration)
         {
             DbContext = context;
             configuration = _configuration;
         }
 
+
         public async Task<(ErrorProvider, List<User>)> GetUsers()
         {
             var users = await DbContext.Users.ToListAsync();
-            if(users.Count == 0)
+            if (users.Count == 0)
             {
                 error = new ErrorProvider()
                 {
@@ -45,31 +48,29 @@ namespace PickMeUpApp.Services
             return (error, users);
         }
 
-        public async Task<(ErrorProvider, List<dtoUserRoute>)> GetRoutes()
+        public async Task<(ErrorProvider, List<TheRoute>)> GetUserRoutes(string token)
         {
-            var routes = await DbContext.UserRoutes.Select(x => new dtoUserRoute(x.User, x.Route)).ToListAsync();
+            if (token == null)
+                return (defaultError, null);
 
-            if(routes.Count == 0)
+            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
+
+            if (!tokenValidator.ValidateToken(token))
             {
                 error = new ErrorProvider()
                 {
                     Status = true,
-                    Name = "Nema ruta u bazi!"
+                    Name = "Token nije validan!"
                 };
                 return (error, null);
             }
-            return (error, routes);
 
-        }
+            var decodedToken = tokenValidator.DecodeToken(token);
+            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
 
-        public async Task<(ErrorProvider, List<dtoTheRoute>)> GetUserRoutes(string email)
-        {
-            if(email == null)
-                return (defaultError, null);
+            var user = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == emailClaim);
 
-            var user = await DbContext.Users.FirstOrDefaultAsync(x=>x.Email == email);
-
-            if(user == null)
+            if (user == null)
             {
                 error = new ErrorProvider()
                 {
@@ -79,11 +80,10 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var routesIds = await DbContext.UserRoutes.Where(x => x.UserId == user.UserId).Select(x => x.RouteId).ToListAsync();
-            var dtoRoutes = await DbContext.Routes.Where(x => routesIds.Contains(x.Id))
-                .Select(x => new dtoTheRoute() { Name = x.Name, Description = x.Description, DateAndTime = x.Description, SeatsNumber = x.SeatsNumber, Price = x.Price }).ToListAsync();
+            var routesIds = await DbContext.UserRoutes.Where(x => x.UserId == user.Id).Select(x => x.RouteId).ToListAsync();
+            var routes = await DbContext.Routes.Where(x => routesIds.Contains(x.Id)).ToListAsync();
 
-            if(dtoRoutes.Count == 0)
+            if (routes.Count == 0)
             {
                 error = new ErrorProvider()
                 {
@@ -92,13 +92,11 @@ namespace PickMeUpApp.Services
                 };
                 return (error, null);
             }
-            
-            return (error, dtoRoutes);
-            
+            return (error, routes);
         }
+    
 
-
-        public async Task<(ErrorProvider, dtoUser)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContextAccessor)
+    public async Task<(ErrorProvider, User)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContextAccessor)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -126,14 +124,6 @@ namespace PickMeUpApp.Services
                 PhoneNumber = userDto.PhoneNumber
             };
 
-            var dtoUser = new dtoUser()
-            {
-                FirstName = newUser.FirstName,
-                LastName = newUser.LastName,
-                Email = newUser.Email,
-                PhoneNumber = newUser.PhoneNumber
-            };
-
             await DbContext.Users.AddAsync(newUser);
             await DbContext.SaveChangesAsync();
             var token = CreateToken(newUser);
@@ -148,11 +138,11 @@ namespace PickMeUpApp.Services
 
             httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
-            return (error, dtoUser);
+            return (error, newUser);
 
         }
 
-        public async Task<(ErrorProvider, dtoUser)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
+        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -190,15 +180,8 @@ namespace PickMeUpApp.Services
 
             httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
-            var dtoUserFromDatabase = new dtoUser()
-            {
-                FirstName = userFromDatabase.FirstName,
-                LastName = userFromDatabase.LastName,
-                Email = userFromDatabase.Email,
-                PhoneNumber = userFromDatabase.PhoneNumber
-            };
 
-            return (error, dtoUserFromDatabase);
+            return (error, userFromDatabase);
 
         }
 
@@ -226,255 +209,9 @@ namespace PickMeUpApp.Services
             return jwt;
         }
 
-        public async Task<(ErrorProvider, dtoTheRoute)> AddRoute(dtoUserRoute route)
-        {
-            if (route == null)
-                return (defaultError, null);
 
-            if(route.Route.SeatsNumber == 0)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Broj slobodnih mjesta mora biti minimalno 1"
-                };
-                return (error, null);
-            }
-
-            var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == route.User.Email);
-
-            if(userFromDatabase == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji user sa poslanom email adresom!"
-                };
-                return (error, null);
-            }
-
-            var newRoute = new TheRoute()
-            {
-                Name = route.Route.Name,
-                Description = route.Route.Description,
-                SeatsNumber = route.Route.SeatsNumber,
-                DateAndTime = route.Route.DateAndTime,
-                Price = route.Route.Price
-            };
-
-            await DbContext.Routes.AddAsync(newRoute);
-            await DbContext.SaveChangesAsync();
-
-            var userRoute = new UserRoute()
-            {
-                UserId = userFromDatabase.UserId,
-                RouteId = newRoute.Id,
-                Route = newRoute,
-                User = userFromDatabase
-            };
-
-            await DbContext.UserRoutes.AddAsync(userRoute);
-            await DbContext.SaveChangesAsync();
-
-            return (error, route.Route);
-        }
-
-        public async Task<(ErrorProvider, dtoRequest)> SendRequest(dtoRequest dtoRequest)
-        {
-            if (dtoRequest == null)
-                return (defaultError, null);
-
-            var (userId, routeId) = await DoesExistRoute(dtoRequest);
-            var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == dtoRequest.passengerEmail);
-            var userRoute = await DbContext.UserRoutes.Include(x => x.User).Include(x => x.Route).FirstOrDefaultAsync(x => x.UserId == userId && x.RouteId == routeId);
-
-            if(dtoRequest.dtoUserRoute.User.Email == dtoRequest.passengerEmail)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne mozete slati zahtjev za rutu koju ste vi kreirali!"
-                };
-                return (error, null);
-            }
-            if (userRoute == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji poslana ruta u bazi!"
-                };
-                return (error, null);
-            }
-
-            if(userRoute.Route.SeatsNumber == 0)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Sva mjesta su popunjena!"
-                };
-            }
-
-            if(passenger == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji user sa poslanom passenger adresom u bazi!"
-                };
-                return(error, null);
-            }
-            
-            var request = new Request()
-            {
-                UserRoute = userRoute,
-                PassengerEmail = dtoRequest.passengerEmail,
-                Description = dtoRequest.Description,
-                Status = dtoRequest.Status
-            };
-
-            await DbContext.Requests.AddAsync(request);
-            await DbContext.SaveChangesAsync();
-
-            return (error, dtoRequest); 
-        }
-
-        private async Task<(int,int)> DoesExistRoute (dtoRequest dtoRequest)
-        {
-            var userId = await DbContext.Users.Where(x => x.Email == dtoRequest.dtoUserRoute.User.Email).Select(x => x.UserId).FirstOrDefaultAsync();
-            var routeId = await DbContext.Routes.Where(x => x.Name == dtoRequest.dtoUserRoute.Route.Name &&
-                                                       x.SeatsNumber == dtoRequest.dtoUserRoute.Route.SeatsNumber &&
-                                                       x.DateAndTime == dtoRequest.dtoUserRoute.Route.DateAndTime &&
-                                                       x.Description == dtoRequest.dtoUserRoute.Route.Description).Select(x => x.Id).FirstOrDefaultAsync();
-            return (userId, routeId);
-        }
-
-        private async Task<Request> DoesExistRequest(dtoRequest dtoRequest)
-        {
-            var (userId, routeId) = await DoesExistRoute(dtoRequest);
-            var userRoute = await DbContext.UserRoutes.FirstOrDefaultAsync(x => x.UserId == userId && x.RouteId == routeId);
-
-            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute.UserId == userId &&
-                                                                          x.UserRoute.RouteId == routeId &&
-                                                                          x.PassengerEmail == dtoRequest.passengerEmail &&
-                                                                          x.Status == dtoRequest.Status).Include(x => x.UserRoute.User)
-                                                                          .Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
-
-            return requestfromDatabase;
-        }
-
-        public async Task<(ErrorProvider, List<dtoRequest>)> GetSentRequests(string passengerEmail)
-        {
-            if (string.IsNullOrEmpty(passengerEmail))
-                return (defaultError, null);
-
-            var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == passengerEmail);
-
-            if(passenger == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji user sa poslanom email adresom!"
-                };
-                return (error, null);
-            }
-
-            var dtoRequests = await DbContext.Requests.Where(x => x.PassengerEmail == passengerEmail).Include(x => x.UserRoute.User).Include(x=>x.UserRoute.Route)
-                .Select(x => new dtoRequest(x)).ToListAsync();
-
-
-            if(dtoRequests.Count == 0)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji niti jedan request!"
-                };
-                return (error, null);
-            }
-
-            return (error, dtoRequests);
-        }
-
-        public async Task<(ErrorProvider, dtoRequest)> AcceptOrDeclineRequest(int choise, dtoRequest request)
-        {
-            if (request == null || choise == null)
-                return (defaultError, null);
-
-            if (choise != 0 && choise != 1)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Polje choise nije validno!"
-                };
-                return (error, null);
-            }
-
-            var requestFromDatabase = await DoesExistRequest(request);
-
-            if (requestFromDatabase == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji taj request u bazi!"
-                };
-                return (error, null);
-            }
-
-            if (choise == 0)
-            {
-                requestFromDatabase.Status = "Declined"; 
-            }
-            else if (choise == 1)
-            {
-                requestFromDatabase.Status = "Accepted";
-                requestFromDatabase.UserRoute.Route.SeatsNumber -= 1;
-            }
-
-            await DbContext.SaveChangesAsync();
-            request.Status = "Accepted";
-
-            return (error, request);
-            
-        }
-
-        public async Task<(ErrorProvider, List<dtoRequest>)> GetRecivedRequests(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-                return (defaultError, null);
-
-            var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
-
-            if (userFromDatabase == null)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Ne postoji user sa poslanom email adresom!"
-                };
-                return (error, null);
-            }
-
-            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == email && x.Status.ToLower() == "panding").Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route)
-                .Select(x => new dtoRequest(x)).ToListAsync();
-
-            if (requests.Count == 0)
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "User nema dobijenih requestova!"
-                };
-                return (error, null);   
-            }
-
-            return (error,  requests);
-        }
 
     }
 }
+
 
