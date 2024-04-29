@@ -81,7 +81,7 @@ namespace PickMeUpApp.Services
         }
     
 
-    public async Task<(ErrorProvider, User)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContext)
+    public async Task<(ErrorProvider, dtoUser)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContext)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -113,6 +113,15 @@ namespace PickMeUpApp.Services
             await DbContext.SaveChangesAsync();
             var token = CreateToken(newUser);
 
+            var newDtoUser = new dtoUser()
+            {
+                UserToken = token,
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Email = newUser.Email,
+                PhoneNumber = newUser.PhoneNumber
+            };
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -123,11 +132,11 @@ namespace PickMeUpApp.Services
 
             httpContext.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
-            return (error, newUser);
+            return (error, newDtoUser);
 
         }
 
-        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContext)
+        public async Task<(ErrorProvider, dtoUser)> UserLogin(dtoUserLogin userDto, HttpContext httpContext)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -155,6 +164,14 @@ namespace PickMeUpApp.Services
             }
             var token = CreateToken(userFromDatabase);
 
+            var newDtoUser = new dtoUser()
+            {
+                UserToken = token,
+                FirstName = userFromDatabase.FirstName,
+                LastName = userFromDatabase.LastName,
+                Email = userFromDatabase.Email,
+                PhoneNumber = userFromDatabase.PhoneNumber
+            };
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = false,
@@ -166,7 +183,7 @@ namespace PickMeUpApp.Services
             httpContext.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
 
-            return (error, userFromDatabase);
+            return (error, newDtoUser);
 
         }
 
