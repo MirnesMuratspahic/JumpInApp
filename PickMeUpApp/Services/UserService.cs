@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using System.Net.Http;
 
 namespace PickMeUpApp.Services
 
@@ -18,12 +19,11 @@ namespace PickMeUpApp.Services
     public class UserService : IUserService
     {
         public ApplicationDbContext DbContext { get; set; }
-
         public IConfiguration configuration { get; set; }
-
         public ErrorProvider error = new ErrorProvider() { Status = false};
-
         public ErrorProvider defaultError = new ErrorProvider() { Status = true, Name = "Property koji ste poslali ne smije biti null!" };
+        public string EmailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+
         public UserService() { }
         public UserService(ApplicationDbContext context, IConfiguration _configuration)
         {
@@ -48,25 +48,10 @@ namespace PickMeUpApp.Services
             return (error, users);
         }
 
-        public async Task<(ErrorProvider, List<TheRoute>)> GetUserRoutes(string token)
+        public async Task<(ErrorProvider, List<TheRoute>)> GetUserRoutes(HttpContext httpContext)
         {
-            if (token == null)
-                return (defaultError, null);
 
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(token))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(token);
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
 
             var user = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == emailClaim);
 
@@ -96,7 +81,7 @@ namespace PickMeUpApp.Services
         }
     
 
-    public async Task<(ErrorProvider, User)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContextAccessor)
+    public async Task<(ErrorProvider, User)> UserRegistration(dtoUserRegistration userDto, HttpContext httpContext)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -136,13 +121,13 @@ namespace PickMeUpApp.Services
                 SameSite = SameSiteMode.Lax
             };
 
-            httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
+            httpContext.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
             return (error, newUser);
 
         }
 
-        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContextAccessor)
+        public async Task<(ErrorProvider, User)> UserLogin(dtoUserLogin userDto, HttpContext httpContext)
         {
             if (userDto == null)
                 return (defaultError, null);
@@ -172,13 +157,13 @@ namespace PickMeUpApp.Services
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false,
                 Expires = DateTime.Now.AddDays(1),
                 Secure = true,
                 SameSite = SameSiteMode.Lax
             };
 
-            httpContextAccessor.Response.Cookies.Append("jwtToken", token, cookieOptions);
+            httpContext.Response.Cookies.Append("jwtToken", token, cookieOptions);
 
 
             return (error, userFromDatabase);

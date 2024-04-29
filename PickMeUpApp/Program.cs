@@ -3,6 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using PickMeUpApp.Services.Interfaces;
 using PickMeUpApp.Services;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using FluentAssertions.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +27,23 @@ builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UsersApiConnectionString")));
 builder.Services.AddCors(options => options.AddPolicy("AllowAnyOrigin",
         builder => { builder.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader(); }));
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!))
+            };
+        });
+
+// Dodajte autorizaciju
+builder.Services.AddAuthorization();
 
 builder.Services.AddHttpContextAccessor();
 
