@@ -7,24 +7,19 @@ using PickMeUpApp.Services.Interfaces;
 
 namespace PickMeUpApp.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RequestController : ControllerBase
+    public class RequestController : BaseController
     {
-        public IRequestService requestService { get; set; }
-        public IHttpContextAccessor httpContextAccessor;
-        public RequestController(IRequestService _requestService, IHttpContextAccessor _httpContextAccessor) 
+        public IRequestService _requestService { get; set; }
+        public RequestController(IRequestService requestService, IHttpContextAccessor _httpContextAccessor) : base(_httpContextAccessor)
         {
-            requestService = _requestService;
-            httpContextAccessor = _httpContextAccessor;
+            _requestService = requestService;
         }
 
         [HttpPost("SendRequest")]
         public async Task<IActionResult> SendRequest(dtoRequestSent dtoRequest)
         {
-            var (errorStatus, request) = await requestService.SendRequest(dtoRequest, httpContextAccessor.HttpContext);
-            if (errorStatus.Status == true)
+            var (errorStatus, request) = await _requestService.SendRequest(dtoRequest, httpContextAccessor.HttpContext);
+            if (errorStatus.Status)
                 return BadRequest(errorStatus.Name);
             return Ok(request);
         }
@@ -32,8 +27,8 @@ namespace PickMeUpApp.Controllers
         [HttpGet("GetSentRequests")]
         public async Task<IActionResult> GetSentRequests()
         {
-            var (errorStatus, sentRequests) = await requestService.GetSentRequests(httpContextAccessor.HttpContext);
-            if (errorStatus.Status == true)
+            var (errorStatus, sentRequests) = await _requestService.GetSentRequests(httpContextAccessor.HttpContext);
+            if (errorStatus.Status)
                 return BadRequest(errorStatus.Name);
             return Ok(sentRequests);
         }
@@ -41,8 +36,8 @@ namespace PickMeUpApp.Controllers
         [HttpPost("AcceptOrDeclineRequest/{choise}")]
         public async Task<IActionResult> AcceptOrDeclineRequest([FromRoute] int choise, Request request)
         {
-            var (errorStatus, acceptedRequests) = await requestService.AcceptOrDeclineRequest(choise, request, httpContextAccessor.HttpContext);
-            if (errorStatus.Status == true)
+            var (errorStatus, acceptedRequests) = await _requestService.AcceptOrDeclineRequest(choise, request, httpContextAccessor.HttpContext);
+            if (errorStatus.Status)
                 return BadRequest(errorStatus.Name);
             return Ok(acceptedRequests);
         }
@@ -50,8 +45,8 @@ namespace PickMeUpApp.Controllers
         [HttpGet("GetRecivedRequests")]
         public async Task<IActionResult> GetRecivedRequests()
         {
-            var (errorStatus, recivedRequests) = await requestService.GetRecivedRequests(httpContextAccessor.HttpContext);
-            if (errorStatus.Status == true)
+            var (errorStatus, recivedRequests) = await _requestService.GetRecivedRequests(httpContextAccessor.HttpContext);
+            if (errorStatus.Status)
                 return BadRequest(errorStatus.Name);
             return Ok(recivedRequests);
         }

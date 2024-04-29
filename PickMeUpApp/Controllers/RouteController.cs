@@ -8,22 +8,19 @@ using PickMeUpApp.Services.Interfaces;
 namespace PickMeUpApp.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RouteController : ControllerBase
+    public class RouteController : BaseController
     {
-        private readonly IRouteService userService;
-        public IHttpContextAccessor httpContextAccessor;
-        public RouteController(IRouteService _routeService, IHttpContextAccessor _httpContextAccessor)
+        private readonly IRouteService _routeService;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public RouteController(IRouteService routeService, IHttpContextAccessor _httpContextAccessor) : base(_httpContextAccessor)
         {
-            userService = _routeService;
-            httpContextAccessor = _httpContextAccessor;
+            _routeService = routeService;   
         }
 
         [HttpGet("GetRoutes")]
         public async Task<IActionResult> GetRoutes()
         {
-            var (errorStatus, routes) = await userService.GetRoutes();
+            var (errorStatus, routes) = await _routeService.GetRoutes();
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(routes);
@@ -32,7 +29,7 @@ namespace PickMeUpApp.Controllers
         [HttpPost("AddRoute")]
         public async Task<IActionResult> AddRoute(UserRoute dtoRoute)
         {
-            var (errorStatus, route) = await userService.AddRoute(dtoRoute, httpContextAccessor.HttpContext);
+            var (errorStatus, route) = await _routeService.AddRoute(dtoRoute, httpContextAccessor.HttpContext);
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(route);
