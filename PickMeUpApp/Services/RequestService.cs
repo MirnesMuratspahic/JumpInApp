@@ -13,11 +13,11 @@ namespace PickMeUpApp.Services
     public class RequestService : IRequestService
     {
         public ApplicationDbContext DbContext { get; set; }
-
         IConfiguration configuration;
         public ErrorProvider error = new ErrorProvider() { Status = false };
-
         public ErrorProvider defaultError = new ErrorProvider() { Status = true, Name = "Property koji ste poslali ne smije biti null!" };
+        public string EmailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+
 
         public RequestService() { }
         public RequestService(ApplicationDbContext context, IConfiguration _configuration)
@@ -26,28 +26,13 @@ namespace PickMeUpApp.Services
             configuration = _configuration;
         }
 
-        public async Task<(ErrorProvider, Request)> SendRequest(dtoRequestSent dtoRequest)
+        public async Task<(ErrorProvider, Request)> SendRequest(dtoRequestSent dtoRequest, HttpContext httpContext)
         {
             if (dtoRequest == null)
                 return (defaultError, null);
 
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(dtoRequest.passengerToken))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(dtoRequest.passengerToken);
-
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
-
-            var routeFromDatabase= await DoesExistRoute(dtoRequest.UserRoute);
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
+            var routeFromDatabase = await DoesExistRoute(dtoRequest.UserRoute);
             var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == emailClaim);
 
             if (dtoRequest.UserRoute.User.Email == emailClaim)
@@ -124,25 +109,10 @@ namespace PickMeUpApp.Services
         }
 
 
-        public async Task<(ErrorProvider, List<Request>)> GetSentRequests(string token)
+        public async Task<(ErrorProvider, List<Request>)> GetSentRequests(HttpContext httpContext)
         {
-            if (string.IsNullOrEmpty(token))
-                return (defaultError, null);
 
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(token))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(token);
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
 
             var passenger = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == emailClaim);
 
@@ -173,26 +143,12 @@ namespace PickMeUpApp.Services
             return (error, dtoRequests);
         }
 
-        public async Task<(ErrorProvider, Request)> AcceptOrDeclineRequest(int choise, dtoRequestRecived request)
+        public async Task<(ErrorProvider, Request)> AcceptOrDeclineRequest(int choise, Request request, HttpContext httpContext)
         {
             if (request == null || choise == null)
                 return (defaultError, null);
 
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(request.UserToken))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(request.UserToken);
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
-
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
             if (choise != 0 && choise != 1)
             {
                 error = new ErrorProvider()
@@ -203,7 +159,7 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var requestFromDatabase = await DoesExistRequest(request.Request);
+            var requestFromDatabase = await DoesExistRequest(request);
 
             if (requestFromDatabase == null)
             {
@@ -226,32 +182,15 @@ namespace PickMeUpApp.Services
             }
 
             await DbContext.SaveChangesAsync();
-            request.Request.Status = "Accepted";
+            request.Status = "Accepted";
 
             return (error, requestFromDatabase);
 
         }
 
-        public async Task<(ErrorProvider, List<Request>)> GetRecivedRequests(string token)
+        public async Task<(ErrorProvider, List<Request>)> GetRecivedRequests(HttpContext httpContext)
         {
-            if (string.IsNullOrEmpty(token))
-                return (defaultError, null);
-
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(token))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(token);
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
-
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
             var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == emailClaim);
 
             if (userFromDatabase == null)

@@ -433,3 +433,5 @@ C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\obj\Debug\net8.0\refint\PickMeUpApp.
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.pdb
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\obj\Debug\net8.0\PickMeUpApp.genruntimeconfig.cache
 C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\obj\Debug\net8.0\ref\PickMeUpApp.dll
+C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\FluentAssertions.dll
+C:\Users\DT User\Desktop\Jumpin\PickMeUpApp\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

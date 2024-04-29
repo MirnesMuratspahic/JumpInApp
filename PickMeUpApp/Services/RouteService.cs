@@ -6,6 +6,7 @@ using PickMeUpApp.Context;
 using PickMeUpApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace PickMeUpApp.Services
 {
@@ -14,6 +15,7 @@ namespace PickMeUpApp.Services
         public ApplicationDbContext DbContext { get; set; }
         public IConfiguration configuration { get; set; }
         public ErrorProvider error = new ErrorProvider() { Status = false };
+        public string EmailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
 
         public ErrorProvider defaultError = new ErrorProvider() { Status = true, Name = "Property koji ste poslali ne smije biti null!" };
         public RouteService(ApplicationDbContext dbContext, IConfiguration _configuration)
@@ -23,7 +25,8 @@ namespace PickMeUpApp.Services
         }
         public async Task<(ErrorProvider, List<UserRoute>)> GetRoutes()
         {
-            var routes = await DbContext.UserRoutes.Include(x=>x.User).Include(x=>x.Route).ToListAsync();
+
+            var routes = await DbContext.UserRoutes.Include(x => x.User).Include(x => x.Route).ToListAsync();
 
             if (routes.Count == 0)
             {
@@ -38,25 +41,12 @@ namespace PickMeUpApp.Services
 
         }
 
-        public async Task<(ErrorProvider, TheRoute)> AddRoute(dtoUserRoute route)
+        public async Task<(ErrorProvider, TheRoute)> AddRoute(UserRoute route, HttpContext httpContext)
         {
             if (route == null)
                 return (defaultError, null);
 
-            var tokenValidator = new TokenValidator(configuration.GetSection("AppSettings:Token").Value!);
-
-            if (!tokenValidator.ValidateToken(route.UserToken))
-            {
-                error = new ErrorProvider()
-                {
-                    Status = true,
-                    Name = "Token nije validan!"
-                };
-                return (error, null);
-            }
-
-            var decodedToken = tokenValidator.DecodeToken(route.UserToken);
-            var emailClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
+            var emailClaim = httpContext.User.Claims.FirstOrDefault(claim => claim.Type == EmailClaim)?.Value;
 
 
             if (route.Route.SeatsNumber == 0)

@@ -29,11 +29,11 @@ namespace PickMeUpApp.Controllers
             return Ok(users);
         }
 
-
-        [HttpPost("GetUserRoutes")]
-        public async Task<IActionResult> GetUserRoutes ([FromBody] string token)
+        [Authorize]
+        [HttpGet("GetUserRoutes")]
+        public async Task<IActionResult> GetUserRoutes ()
         {
-            var (errorStatus, routes) = await userService.GetUserRoutes(token);
+            var (errorStatus, routes) = await userService.GetUserRoutes(httpContextAccessor.HttpContext);
             if (errorStatus.Status == true)
                 return BadRequest(errorStatus.Name);
             return Ok(routes);
