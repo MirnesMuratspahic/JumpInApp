@@ -30,6 +30,16 @@ namespace PickMeUpApp.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetUserByEmail")]
+        public async Task<IActionResult> GetUserByEmail([FromBody]string email)
+        {
+            var (errorStatus, user) = await userService.GetUserByEmail(email);
+            if(errorStatus.Status == true)
+                return BadRequest(errorStatus.Name);
+            return Ok(user);
+        }
+
+        [Authorize]
         [HttpGet("GetUserRoutes")]
         public async Task<IActionResult> GetUserRoutes ()
         {
