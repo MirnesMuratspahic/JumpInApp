@@ -19,7 +19,6 @@ namespace PickMeUpApp.Services
         public string EmailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
 
 
-        public RequestService() { }
         public RequestService(ApplicationDbContext context, IConfiguration _configuration)
         {
             DbContext = context;
@@ -80,6 +79,18 @@ namespace PickMeUpApp.Services
                 Description = dtoRequest.Description,
                 Status = dtoRequest.Status
             };
+
+            var requestFromDatabase = await DoesExistRequest(request);
+
+            if(requestFromDatabase != null && requestFromDatabase.Status.ToLower() == "pending") 
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Vec ste poslali zahtjev za tu rutu!"
+                };
+                return (error, null);
+            }
 
             await DbContext.Requests.AddAsync(request);
             await DbContext.SaveChangesAsync();
@@ -203,7 +214,7 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == emailClaim && x.Status.ToLower() == "panding")
+            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == emailClaim && x.Status.ToLower() == "pending")
                 .Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route).ToListAsync();
 
             if (requests.Count == 0)
