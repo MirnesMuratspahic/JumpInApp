@@ -30,7 +30,7 @@ namespace PickMeUpApp.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetUserByEmail")]
+        [HttpPost("GetUserByEmail")]
         public async Task<IActionResult> GetUserByEmail([FromBody]string email)
         {
             var (errorStatus, user) = await userService.GetUserByEmail(email);
