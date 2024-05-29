@@ -77,6 +77,10 @@ namespace PickMeUpApp.Migrations
                     b.Property<int>("SeatsNumber")
                         .HasColumnType("int");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Routes");

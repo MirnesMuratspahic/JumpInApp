@@ -48,6 +48,29 @@ namespace PickMeUpApp.Services
             return (error, users);
         }
 
+        public async Task<(ErrorProvider, User)> GetUserByEmail(string email)
+        {
+            if(email == null)
+            {
+                return(defaultError, null);
+            }
+
+            var userFromDatabase = await DbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (userFromDatabase == null)
+            {
+                error = new ErrorProvider()
+                {
+                    Status = true,
+                    Name = "Ne postoji user sa poslanim emailom!"
+
+                };
+                return (error, null);
+            }
+
+            return (error, userFromDatabase);
+        }
+
         public async Task<(ErrorProvider, List<TheRoute>)> GetUserRoutes(HttpContext httpContext)
         {
 
