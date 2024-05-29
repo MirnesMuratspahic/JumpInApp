@@ -11,8 +11,8 @@ using PickMeUpApp.Context;
 namespace PickMeUpApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240426164951_initial migration")]
-    partial class initialmigration
+    [Migration("20240507153559_Initial migration")]
+    partial class Initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
