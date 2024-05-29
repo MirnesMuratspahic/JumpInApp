@@ -77,7 +77,8 @@ namespace PickMeUpApp.Services
                 Description = route.Route.Description,
                 SeatsNumber = route.Route.SeatsNumber,
                 DateAndTime = route.Route.DateAndTime,
-                Price = route.Route.Price
+                Price = route.Route.Price,
+                Type = route.Route.Type
             };
 
             await DbContext.Routes.AddAsync(newRoute);

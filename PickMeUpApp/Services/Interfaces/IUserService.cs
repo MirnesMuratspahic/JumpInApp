@@ -9,5 +9,6 @@ namespace PickMeUpApp.Services.Interfaces
         Task<(ErrorProvider, List<TheRoute>)> GetUserRoutes(HttpContext httpContext);
         Task<(ErrorProvider, dtoUser)> UserRegistration(dtoUserRegistration user, HttpContext httpContext);
         Task<(ErrorProvider, dtoUser)> UserLogin(dtoUserLogin userDto, HttpContext httpContext);
+        Task<(ErrorProvider, User)> GetUserByEmail(string email);
     }
 }

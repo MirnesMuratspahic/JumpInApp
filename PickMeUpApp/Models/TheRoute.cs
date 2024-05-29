@@ -16,5 +16,7 @@ namespace PickMeUpApp.Models
         public float Price { get; set; }
         [Required]
         public string Description { get; set; } = string.Empty;
+        [Required]
+        public string Type { get; set; } = string.Empty;
     }
 }

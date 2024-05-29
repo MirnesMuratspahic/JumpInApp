@@ -19,7 +19,6 @@ namespace PickMeUpApp.Services
         public string EmailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
 
 
-        public RequestService() { }
         public RequestService(ApplicationDbContext context, IConfiguration _configuration)
         {
             DbContext = context;
@@ -81,6 +80,21 @@ namespace PickMeUpApp.Services
                 Status = dtoRequest.Status
             };
 
+            var requestFromDatabase = await DoesExistRequest(request);
+
+            if(requestFromDatabase != null) 
+            {
+                if (requestFromDatabase.Status.ToLower() == "pending" || requestFromDatabase.Status.ToLower() == "accepted")
+                {
+                    error = new ErrorProvider()
+                    {
+                        Status = true,
+                        Name = "Vec ste poslali zahtjev za tu rutu!"
+                    };
+                    return (error, null);
+                }
+            }
+
             await DbContext.Requests.AddAsync(request);
             await DbContext.SaveChangesAsync();
 
@@ -88,15 +102,11 @@ namespace PickMeUpApp.Services
         }
 
         private async Task<Request> DoesExistRequest(Request request)
-        {
-            if (await DoesExistRoute(request.UserRoute) != null)
-            {
-                var requestfromDatabase = await DbContext.Requests.Where(x => x.PassengerEmail == request.PassengerEmail &&
-                                                                          x.Status.ToLower() == request.Status.ToLower()).Include(x => x.UserRoute.User)
-                                                                         .Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
-                return requestfromDatabase;
-            }
-            return null;
+        { 
+            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute == request.UserRoute &&
+                                                                              x.Description == request.Description &&
+                                                                              x.Status.ToLower() == request.Status.ToLower()).FirstOrDefaultAsync();
+            return requestfromDatabase;
         }
         private async Task<UserRoute> DoesExistRoute(UserRoute route)
         { 
@@ -104,7 +114,8 @@ namespace PickMeUpApp.Services
                                                        x.Route.Name == route.Route.Name &&
                                                        x.Route.SeatsNumber == route.Route.SeatsNumber &&
                                                        x.Route.DateAndTime == route.Route.DateAndTime &&
-                                                       x.Route.Description == route.Route.Description).FirstOrDefaultAsync();
+                                                       x.Route.Description == route.Route.Description &&
+                                                       x.Route.Type.ToLower() == route.Route.Type.ToLower()).FirstOrDefaultAsync();
             return (routeFromDatabase);
         }
 
@@ -203,7 +214,7 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == emailClaim && x.Status.ToLower() == "panding")
+            var requests = await DbContext.Requests.Where(x => x.UserRoute.User.Email == emailClaim && x.Status.ToLower() == "pending")
                 .Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route).ToListAsync();
 
             if (requests.Count == 0)
