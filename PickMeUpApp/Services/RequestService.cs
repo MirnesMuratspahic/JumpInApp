@@ -103,9 +103,7 @@ namespace PickMeUpApp.Services
 
         private async Task<Request> DoesExistRequest(Request request)
         { 
-            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute == request.UserRoute &&
-                                                                              x.Description == request.Description &&
-                                                                              x.Status.ToLower() == request.Status.ToLower()).FirstOrDefaultAsync();
+            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute == request.UserRoute).FirstOrDefaultAsync();
             return requestfromDatabase;
         }
         private async Task<UserRoute> DoesExistRoute(UserRoute route)
