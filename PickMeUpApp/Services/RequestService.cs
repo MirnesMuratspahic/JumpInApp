@@ -102,9 +102,24 @@ namespace PickMeUpApp.Services
         }
 
         private async Task<Request> DoesExistRequest(Request request)
-        { 
-            var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute == request.UserRoute).FirstOrDefaultAsync();
-            return requestfromDatabase;
+        {
+            //var route = DoesExistRoute(request.UserRoute);
+            //if (route != null)
+            //{
+                var requestfromDatabase = await DbContext.Requests.Where(x => x.UserRoute.User.FirstName == request.UserRoute.User.FirstName
+                                                                           && x.UserRoute.User.LastName == request.UserRoute.User.LastName
+                                                                           && x.UserRoute.User.Email == request.UserRoute.User.Email
+                                                                           && x.UserRoute.User.PhoneNumber == request.UserRoute.User.PhoneNumber
+                                                                           && x.UserRoute.Route.Name == request.UserRoute.Route.Name
+                                                                           && x.UserRoute.Route.DateAndTime == request.UserRoute.Route.DateAndTime
+                                                                           && x.UserRoute.Route.Description == request.UserRoute.Route.Description).Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
+                return requestfromDatabase;
+            //}
+            //else
+            //{
+            //    return null;
+            //}
+            
         }
         private async Task<UserRoute> DoesExistRoute(UserRoute route)
         { 
@@ -180,11 +195,11 @@ namespace PickMeUpApp.Services
                 return (error, null);
             }
 
-            if (choise == 0)
+            if (choise == 0 && requestFromDatabase.Status.ToLower() == "pending")
             {
                 requestFromDatabase.Status = "Declined";
             }
-            else if (choise == 1)
+            else if (choise == 1 && requestFromDatabase.Status.ToLower() == "pending")
             {
                 requestFromDatabase.Status = "Accepted";
                 requestFromDatabase.UserRoute.Route.SeatsNumber -= 1;
