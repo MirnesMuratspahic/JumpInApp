@@ -11,7 +11,6 @@ namespace PickMeUpApp.Models.DTO
         [Required]
         public string Status { get; set; }
 
-        public dtoRequestSent() { }
 
     }
 }
