@@ -82,7 +82,7 @@ namespace PickMeUpApp.Services
 
             var requestFromDatabase = await DoesExistRequest(request);
 
-            if(requestFromDatabase != null) 
+            if (requestFromDatabase != null)
             {
                 if (requestFromDatabase.Status.ToLower() == "pending" || requestFromDatabase.Status.ToLower() == "accepted")
                 {
@@ -112,7 +112,8 @@ namespace PickMeUpApp.Services
                                                                            && x.UserRoute.User.PhoneNumber == request.UserRoute.User.PhoneNumber
                                                                            && x.UserRoute.Route.Name == request.UserRoute.Route.Name
                                                                            && x.UserRoute.Route.DateAndTime == request.UserRoute.Route.DateAndTime
-                                                                           && x.UserRoute.Route.Description == request.UserRoute.Route.Description).Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
+                                                                           && x.UserRoute.Route.Description == request.UserRoute.Route.Description
+                                                                           && x.PassengerEmail == request.PassengerEmail).Include(x => x.UserRoute.User).Include(x => x.UserRoute.Route).FirstOrDefaultAsync();
                 return requestfromDatabase;
             //}
             //else
@@ -129,7 +130,7 @@ namespace PickMeUpApp.Services
                                                        x.Route.DateAndTime == route.Route.DateAndTime &&
                                                        x.Route.Description == route.Route.Description &&
                                                        x.Route.Type.ToLower() == route.Route.Type.ToLower()).FirstOrDefaultAsync();
-            return (routeFromDatabase);
+            return routeFromDatabase;
         }
 
 
