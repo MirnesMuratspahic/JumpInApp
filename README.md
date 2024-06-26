@@ -1,3 +1,3 @@
 # PickMeUpApp
 
-Site is online: https://jumpin-app.vercel.app/
+ Site is offline right now (backend), coming soon: https://jumpin-app.vercel.app/
